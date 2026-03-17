@@ -4,21 +4,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>تسجيل نسب عرض العربي</title>
-<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap');
-</style>
-<!-- Firebase SDK v9 compat — أسهل وأكثر استقراراً من modular -->
-<script>
-// Firebase loaded via dynamic import for better compatibility
-window._firebaseLoaded = false;
-</script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/app-compat/dist/app-compat.js" 
-  crossorigin="anonymous"
-  onerror="window._firebaseFailed=true"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/firestore-compat/dist/firestore-compat.js" 
-  crossorigin="anonymous"
-  onerror="window._firebaseFailed=true"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --p:#0ea5e9;--pd:#0284c7;--pl:#38bdf8;
@@ -31,7 +20,7 @@ window._firebaseLoaded = false;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Cairo','Tajawal',Arial,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;position:relative}
+body{font-family:'Cairo','Tajawal',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;position:relative}
 .bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .bg-canvas::before{content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(6,182,212,.15) 0%,transparent 60%),
@@ -45,29 +34,30 @@ body{font-family:'Cairo','Tajawal',Arial,sans-serif;background:var(--bg);color:v
 .icon-item{position:absolute;opacity:0;filter:blur(.5px) drop-shadow(0 0 10px var(--p));animation:floatIcon linear infinite;will-change:transform,opacity}
 @keyframes floatIcon{0%{transform:translateY(110vh) rotate(0deg) scale(.7);opacity:0}5%{opacity:.18}90%{opacity:.12}100%{transform:translateY(-15vh) rotate(25deg) scale(1.1);opacity:0}}
 .page-wrapper{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px 100px}
-.header{text-align:center;margin-bottom:48px;animation:fadeDown .9s ease both}
+.header{text-align:center;margin-bottom:40px;animation:fadeDown .9s ease both}
 .header .logo-icon{font-size:48px;display:block;margin-bottom:10px;filter:drop-shadow(0 0 16px var(--p));animation:pulseGlow 3s ease-in-out infinite}
 @keyframes pulseGlow{0%,100%{filter:drop-shadow(0 0 16px var(--p))}50%{filter:drop-shadow(0 0 28px var(--ac2))}}
 .header h1{font-size:clamp(22px,5vw,36px);font-weight:900;background:linear-gradient(135deg,var(--ac2),var(--p),var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
 .header p{margin-top:8px;color:var(--tm);font-size:14px}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.3);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--ac2);font-weight:600;margin-top:10px}
-/* Firebase status */
 .fb-bar{display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(14,165,233,.2);font-size:12px;font-weight:700;background:rgba(14,165,233,.07)}
 .fb-dot{width:8px;height:8px;border-radius:50%;background:#6b7280;transition:background .4s;flex-shrink:0}
 .fb-dot.ok{background:#10b981;box-shadow:0 0 6px #10b981;animation:fbp 2s infinite}
 .fb-dot.err{background:#ef4444}
 @keyframes fbp{0%,100%{opacity:1}50%{opacity:.3}}
+.dashboard-link{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3);border-radius:50px;color:var(--pl);font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;text-decoration:none;margin-top:10px;transition:background .2s,transform .2s}
+.dashboard-link:hover{background:rgba(14,165,233,.2);transform:translateY(-2px)}
 .cta-btn{display:inline-flex;align-items:center;gap:12px;padding:18px 48px;font-family:'Cairo',sans-serif;font-size:clamp(18px,3vw,24px);font-weight:700;color:#fff;background:linear-gradient(135deg,var(--pd),var(--ac));border:none;border-radius:50px;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(14,165,233,.4);transition:transform .25s,box-shadow .25s;animation:fadeUp 1s .3s ease both}
 .cta-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .25s}
 .cta-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 48px rgba(14,165,233,.55)}
 .cta-btn:hover::before{opacity:1}
 .cta-btn:active{transform:scale(.98)}
-.main-panel{width:100%;max-width:820px;margin-top:32px;background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow:hidden;box-shadow:var(--glow),0 32px 64px rgba(0,0,0,.4);max-height:0;opacity:0;transform:translateY(20px);transition:max-height .7s cubic-bezier(.4,0,.2,1),opacity .5s,transform .5s}
-.main-panel.open{max-height:4000px;opacity:1;transform:translateY(0)}
+.main-panel{width:100%;max-width:1050px;margin-top:32px;background:var(--glass);border:1px solid var(--gb);border-radius:var(--r);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow:hidden;box-shadow:var(--glow),0 32px 64px rgba(0,0,0,.4);max-height:0;opacity:0;transform:translateY(20px);transition:max-height .7s cubic-bezier(.4,0,.2,1),opacity .5s,transform .5s}
+.main-panel.open{max-height:6000px;opacity:1;transform:translateY(0)}
 .panel-inner{padding:clamp(20px,4vw,36px)}
 .section-title{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--ac2);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--gb)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
-@media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:28px}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.form-grid{grid-template-columns:1fr}}
 .field-group{display:flex;flex-direction:column;gap:7px}
 .field-label{font-size:13px;font-weight:600;color:var(--tm)}
 .field-label .req{color:var(--pl);margin-right:3px}
@@ -75,18 +65,35 @@ body{font-family:'Cairo','Tajawal',Arial,sans-serif;background:var(--bg);color:v
 .field-input:focus,.field-select:focus{border-color:var(--p);background:rgba(14,165,233,.13);box-shadow:0 0 0 3px rgba(14,165,233,.15)}
 .field-select option{background:#0f2040;color:var(--tx)}
 .field-input::placeholder{color:rgba(125,211,252,.4)}
-.tab-bar{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--gb)}
-.tab-btn{padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--tm);font-family:'Cairo',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:color .2s,border-color .2s;margin-bottom:-1px}
-.tab-btn.active{color:var(--pl);border-bottom-color:var(--p)}
-.brand-section{background:rgba(14,165,233,.05);border:1px solid var(--gb);border-radius:var(--rs);padding:20px;margin-bottom:20px}
-.brand-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.brand-header h4{font-size:15px;font-weight:700;color:var(--ac2)}
-.brand-row{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:12px;animation:fadeUp .35s ease both}
-@media(max-width:560px){.brand-row{grid-template-columns:1fr 1fr}.brand-row>*:first-child{grid-column:1/-1}}
-.add-brand-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:transparent;border:1px dashed rgba(14,165,233,.5);border-radius:50px;color:var(--pl);font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s}
-.add-brand-btn:hover{background:rgba(14,165,233,.1);border-color:var(--p)}
-.remove-btn{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:8px;padding:10px;cursor:pointer;font-size:14px;transition:background .2s;align-self:flex-end;height:42px}
-.remove-btn:hover{background:rgba(239,68,68,.25)}
+.field-input::-webkit-outer-spin-button,.field-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.field-input[type=number]{-moz-appearance:textfield}
+
+/* جدول الأقسام */
+.sections-table-wrap{overflow-x:auto;margin-bottom:20px;border:1px solid var(--gb);border-radius:var(--rs)}
+.sections-table{width:100%;border-collapse:collapse;min-width:750px;font-size:13px}
+.sections-table th{background:rgba(14,165,233,.15);color:var(--ac2);font-weight:700;padding:12px 10px;text-align:center;border-bottom:1px solid var(--gb);white-space:nowrap;font-size:12px}
+.sections-table th:first-child{text-align:right;min-width:130px}
+.sections-table td{padding:10px;border-bottom:1px solid rgba(14,165,233,.08);text-align:center;vertical-align:middle}
+.sections-table td:first-child{text-align:right;font-weight:700;color:var(--pl)}
+.sections-table tr:last-child td{border-bottom:none}
+.sections-table tr:hover td{background:rgba(14,165,233,.04)}
+.sections-table .num-input{width:90px;padding:8px;background:rgba(14,165,233,.07);border:1px solid var(--gb);border-radius:8px;color:var(--tx);font-family:'Cairo',sans-serif;font-size:13px;text-align:center;outline:none;transition:border-color .2s,background .2s}
+.sections-table .num-input:focus{border-color:var(--p);background:rgba(14,165,233,.13)}
+.sections-table .num-input::-webkit-outer-spin-button,.sections-table .num-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.sections-table .num-input[type=number]{-moz-appearance:textfield}
+.pct-cell{font-weight:900;font-size:14px}
+.pct-before{color:#f87171}
+.pct-after{color:#34d399}
+.diff-positive{color:#34d399;font-weight:700}
+.diff-negative{color:#f87171;font-weight:700}
+.diff-zero{color:var(--tm);font-weight:600}
+.section-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.del-row-btn{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;transition:background .2s}
+.del-row-btn:hover{background:rgba(239,68,68,.25)}
+
+.add-section-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:transparent;border:1px dashed rgba(14,165,233,.5);border-radius:50px;color:var(--pl);font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s;margin-bottom:20px}
+.add-section-btn:hover{background:rgba(14,165,233,.1);border-color:var(--p)}
+
 .buttons-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
 @media(max-width:500px){.buttons-row{grid-template-columns:1fr}}
 .calc-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--pd),var(--ac));border:none;border-radius:var(--rs);color:#fff;font-family:'Cairo',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .2s,transform .2s;box-shadow:0 6px 24px rgba(14,165,233,.35)}
@@ -95,28 +102,42 @@ body{font-family:'Cairo','Tajawal',Arial,sans-serif;background:var(--bg);color:v
 .send-btn:hover:not(:disabled){opacity:.92;transform:translateY(-2px)}
 .send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .divider{height:1px;background:linear-gradient(90deg,transparent,var(--gb),transparent);margin:28px 0}
+
+/* نتائج التحليل */
 .results-section{animation:fadeUp .5s ease both}
-.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
-@media(max-width:500px){.results-grid{grid-template-columns:1fr 1fr}}
-.result-card{background:var(--gs);border:1px solid var(--gb);border-radius:var(--rs);padding:18px 14px;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
-.result-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(14,165,233,.2)}
-.result-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--ac2))}
-.result-card .card-icon{font-size:26px;margin-bottom:8px}
-.result-card .card-value{font-size:clamp(22px,4vw,32px);font-weight:900;color:var(--ac2);line-height:1}
-.result-card .card-label{font-size:12px;color:var(--tm);margin-top:5px;font-weight:600}
-.result-card.highlight .card-value{background:linear-gradient(135deg,var(--ac2),var(--pl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.brands-breakdown{background:rgba(14,165,233,.05);border:1px solid var(--gb);border-radius:var(--rs);padding:16px}
-.brands-breakdown h5{font-size:14px;font-weight:700;color:var(--tm);margin-bottom:12px}
-.brand-result-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(14,165,233,.1);font-size:13px}
-.brand-result-row:last-child{border-bottom:none}
-.brand-result-row .bname{font-weight:600;color:var(--pl)}
-.brand-result-row .bcount{color:var(--tm)}
-.brand-result-row .bpct{font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(14,165,233,.15);color:var(--ac2);font-size:12px}
-.progress-wrap{margin-top:16px}
-.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--tm);margin-bottom:6px}
-.progress-bar{height:8px;background:rgba(14,165,233,.12);border-radius:20px;overflow:hidden}
-.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--pd),var(--ac2));width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)}
-/* Toast — hidden by default, NO .show class on load */
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr 1fr}}
+.sum-card{background:var(--gs);border:1px solid var(--gb);border-radius:var(--rs);padding:16px 12px;text-align:center;position:relative;overflow:hidden}
+.sum-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--ac2))}
+.sum-card.before-card::before{background:linear-gradient(90deg,#ef4444,#f87171)}
+.sum-card.after-card::before{background:linear-gradient(90deg,#059669,#34d399)}
+.sum-card.diff-card::before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.sum-card .card-lbl{font-size:11px;color:var(--tm);font-weight:600;margin-bottom:6px}
+.sum-card .card-val{font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1}
+.sum-card.before-card .card-val{color:#f87171}
+.sum-card.after-card .card-val{color:#34d399}
+.sum-card.diff-card .card-val{color:#a78bfa}
+
+.result-table-wrap{overflow-x:auto;border:1px solid var(--gb);border-radius:var(--rs);margin-bottom:20px}
+.result-table{width:100%;border-collapse:collapse;font-size:13px;min-width:650px}
+.result-table th{background:rgba(14,165,233,.12);color:var(--tm);font-weight:700;padding:10px 12px;text-align:center;border-bottom:1px solid var(--gb);white-space:nowrap;font-size:12px}
+.result-table th:first-child{text-align:right}
+.result-table td{padding:10px 12px;border-bottom:1px solid rgba(14,165,233,.07);text-align:center}
+.result-table td:first-child{text-align:right;font-weight:700;color:var(--pl)}
+.result-table tr:last-child td{border-bottom:none}
+.pbar-wrap{display:flex;align-items:center;gap:6px;justify-content:center}
+.pbar-mini{flex:1;height:6px;background:rgba(14,165,233,.1);border-radius:10px;overflow:hidden;min-width:60px}
+.pbar-mini-fill{height:100%;border-radius:10px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.pbar-mini-fill.before{background:linear-gradient(90deg,#ef4444,#f87171)}
+.pbar-mini-fill.after{background:linear-gradient(90deg,#059669,#34d399)}
+
+.analysis-box{background:rgba(14,165,233,.05);border:1px solid var(--gb);border-radius:var(--rs);padding:18px;margin-top:16px}
+.analysis-box h5{font-size:14px;font-weight:700;color:var(--ac2);margin-bottom:12px}
+.analysis-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(14,165,233,.06);font-size:13px}
+.analysis-row:last-child{border-bottom:none}
+.analysis-lbl{color:var(--tm)}
+.analysis-val{font-weight:700;color:var(--tx)}
+
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(120px);opacity:0;pointer-events:none;background:linear-gradient(135deg,#065f46,#059669);border:1px solid rgba(16,185,129,.4);border-radius:50px;padding:14px 28px;color:#fff;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(16,185,129,.4);transition:transform .45s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:9999;white-space:nowrap}
 .toast.error{background:linear-gradient(135deg,#7f1d1d,#ef4444);border-color:rgba(239,68,68,.4);box-shadow:0 8px 32px rgba(239,68,68,.4)}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
@@ -124,7 +145,13 @@ body{font-family:'Cairo','Tajawal',Arial,sans-serif;background:var(--bg);color:v
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--pd);border-radius:10px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--pd);border-radius:10px}
+
+.legend-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:rgba(14,165,233,.04);border-radius:var(--rs);font-size:12px}
+.leg-item{display:flex;align-items:center;gap:6px;font-weight:600}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+.header-actions{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px}
 </style>
 </head>
 <body>
@@ -133,66 +160,125 @@ body{font-family:'Cairo','Tajawal',Arial,sans-serif;background:var(--bg);color:v
 <div class="page-wrapper">
   <header class="header">
     <span class="logo-icon">📊</span>
-    <h1>تسجيل نسب عرض العربي</h1>
-    <p>نظام متابعة ومقارنة نسب عرض منتجات العربي</p>
-
-    <div class="fb-bar"><div class="fb-dot" id="fbDot"></div><span id="fbTxt">جاري الاتصال بـ  ...</span></div>
+    <h2>تسجيل نسب عرض العربي</h2>
+    <p>نظام متابعة ومقارنة نسب عرض منتجات العربي قبل وبعد التحسين</p>
+    <div class="header-actions">
+      <div class="fb-bar"><div class="fb-dot" id="fbDot"></div><span id="fbTxt">جاري الاتصال بـ Firebase...</span></div>
+    </div>
   </header>
 
   <button class="cta-btn" id="ctaBtn" onclick="togglePanel()">
-    <span>📋</span> نسبة عرض
+    <span>📋</span> تسجيل نسب العرض قبل وبعد
   </button>
 
   <div class="main-panel" id="mainPanel">
     <div class="panel-inner">
-      <div class="section-title"><span>🏢</span> بيانات الفرع والمندوب</div>
+      <div class="section-title"><span>🏢</span> البيانات الأساسية</div>
       <div class="form-grid">
         <div class="field-group">
           <label class="field-label"><span class="req">*</span> اسم الفرع</label>
-          <input type="text" class="field-input" id="branchInput" placeholder="مثال: فرع القاهرة - مدينة نصر"/>
+          <input type="text" class="field-input" id="branchInput" placeholder="مثال: فرع القاهرة — مدينة نصر"/>
         </div>
         <div class="field-group">
           <label class="field-label"><span class="req">*</span> اسم المندوب</label>
           <input type="text" class="field-input" id="agentName" placeholder="أدخل اسم المندوب"/>
         </div>
+        <div class="field-group">
+          <label class="field-label">التاريخ</label>
+          <input type="text" class="field-input" id="dateField" readonly style="color:var(--ac2);cursor:default"/>
+        </div>
       </div>
-      <div class="tab-bar"><button class="tab-btn active"> تسجيل نسب العرض</button></div>
-      <div class="brand-section">
-        <div class="brand-header"><span>📦</span><h4>الأقسام</h4></div>
-        <div id="brandRows"></div>
-        <button class="add-brand-btn" onclick="addBrandRow()">➕ إضافة قسم آخر</button>
+
+      <div class="section-title"><span>📦</span> جدول الأقسام — قبل وبعد التحسين</div>
+
+      <div class="legend-row">
+        <div class="leg-item"><div class="leg-dot" style="background:#f87171"></div> قبل التحسين</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#34d399"></div> بعد التحسين</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#a78bfa"></div> فرق النسبة</div>
       </div>
+
+      <div class="sections-table-wrap">
+        <table class="sections-table">
+          <thead>
+            <tr>
+              <th>القسم</th>
+              <th>منتجات العربي<br><small style="font-weight:400;color:#f87171">قبل</small></th>
+              <th>إجمالي المنتجات<br><small style="font-weight:400;color:#f87171">قبل</small></th>
+              <th>منتجات العربي<br><small style="font-weight:400;color:#34d399">بعد</small></th>
+              <th>إجمالي المنتجات<br><small style="font-weight:400;color:#34d399">بعد</small></th>
+              <th>نسبة العرض<br><small style="font-weight:400;color:#f87171">قبل</small></th>
+              <th>نسبة العرض<br><small style="font-weight:400;color:#34d399">بعد</small></th>
+              <th>فرق النسبة</th>
+              <th>حذف</th>
+            </tr>
+          </thead>
+          <tbody id="sectionsBody">
+          </tbody>
+        </table>
+      </div>
+
+      <button class="add-section-btn" onclick="addSectionRow()">➕ إضافة قسم جديد</button>
+
       <div class="buttons-row">
-        <button class="calc-btn" onclick="calculate(true)">🔢 احسب النسبة الآن</button>
-        <button class="send-btn" id="sendBtn" onclick="sendReport()">📤 إرسال التقرير</button>
+        <button class="calc-btn" onclick="calculate(true)">🔢 احسب النسب الآن</button>
+        <button class="send-btn" id="sendBtn" onclick="sendReport()">📤 إرسال التقرير إلى لوحة التحكم</button>
       </div>
+
       <div id="resultsSection" style="display:none">
         <div class="divider"></div>
-        <div class="section-title"><span>📈</span> نتائج التحليل</div>
+        <div class="section-title"><span>📈</span> نتائج المقارنة والتحليل</div>
         <div class="results-section">
-          <div class="results-grid">
-            <div class="result-card"><div class="card-icon">📦</div><div class="card-value" id="resTotal">0</div><div class="card-label">إجمالي المنتجات</div></div>
-            <div class="result-card"><div class="card-icon">⭐</div><div class="card-value" id="resArabi">0</div><div class="card-label">منتجات العربي</div></div>
-            <div class="result-card highlight"><div class="card-icon">📊</div><div class="card-value" id="resPct">0%</div><div class="card-label">نسبة عرض العربي</div></div>
+          <div class="summary-grid">
+            <div class="sum-card before-card">
+              <div class="card-lbl">📉 متوسط نسبة العرض قبل</div>
+              <div class="card-val" id="resBefore">0%</div>
+            </div>
+            <div class="sum-card after-card">
+              <div class="card-lbl">📈 متوسط نسبة العرض بعد</div>
+              <div class="card-val" id="resAfter">0%</div>
+            </div>
+            <div class="sum-card diff-card">
+              <div class="card-lbl">✨ مقدار التحسن</div>
+              <div class="card-val" id="resDiff">0%</div>
+            </div>
           </div>
-          <div class="progress-wrap">
-            <div class="progress-label"><span>نسبة العربي من الإجمالي</span><span id="progressLabel">0%</span></div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+          <div class="result-table-wrap">
+            <table class="result-table" id="resultTable">
+              <thead>
+                <tr>
+                  <th>القسم</th>
+                  <th>نسبة قبل</th>
+                  <th>شريط قبل</th>
+                  <th>نسبة بعد</th>
+                  <th>شريط بعد</th>
+                  <th>الفرق</th>
+                  <th>التقييم</th>
+                </tr>
+              </thead>
+              <tbody id="resultBody"></tbody>
+            </table>
           </div>
-          <div class="divider" style="margin:16px 0"></div>
-          <div class="brands-breakdown"><h5>📋 تفاصيل الأقسام</h5><div id="brandsBreakdown"></div></div>
+
+          <div class="analysis-box">
+            <h5>🔍 تحليل الأداء</h5>
+            <div class="analysis-row"><span class="analysis-lbl">أفضل قسم تحسن</span><span class="analysis-val" id="bestSection">—</span></div>
+            <div class="analysis-row"><span class="analysis-lbl">أضعف قسم أداء</span><span class="analysis-val" id="weakSection">—</span></div>
+            <div class="analysis-row"><span class="analysis-lbl">عدد الأقسام المحسّنة</span><span class="analysis-val" id="improvedCount">0</span></div>
+            <div class="analysis-row"><span class="analysis-lbl">عدد الأقسام المتراجعة</span><span class="analysis-val" id="declinedCount">0</span></div>
+            <div class="analysis-row"><span class="analysis-lbl">تقييم الأداء العام</span><span class="analysis-val" id="overallRating">—</span></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Toast — starts completely hidden -->
 <div class="toast" id="toast"></div>
 
 <script>
 // ══════════════════════════════════════════
-// Firebase init — compat SDK (synchronous)
+// Firebase Config
 // ══════════════════════════════════════════
 const firebaseConfig = {
   apiKey:            "AIzaSyAmzZoKM_YGQAlxHdj6N-s4iUegBrJKNAk",
@@ -200,233 +286,4 @@ const firebaseConfig = {
   databaseURL:       "https://display-a3abe-default-rtdb.firebaseio.com",
   projectId:         "display-a3abe",
   storageBucket:     "display-a3abe.firebasestorage.app",
-  messagingSenderId: "469714964287",
-  appId:             "1:469714964287:web:2aa2e7dd49e46599f38d8a"
-};
-
-let db = null;
-let fbOk = false;
-
-function initFirebase() {
-  try {
-    if (typeof firebase === 'undefined') {
-      throw new Error('Firebase SDK not loaded');
-    }
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    // Test connection
-    db.enableNetwork().then(() => {
-      fbOk = true;
-      setFbStatus(true);
-    }).catch(() => {
-      fbOk = true; // SDK loaded, may still work
-      setFbStatus(true);
-    });
-    fbOk = true;
-    setFbStatus(true);
-  } catch(e) {
-    console.warn("Firebase init error:", e);
-    setFbStatus(false);
-  }
-}
-
-function setFbStatus(ok) {
-  const dot = document.getElementById('fbDot');
-  const txt = document.getElementById('fbTxt');
-  dot.className = 'fb-dot ' + (ok ? 'ok' : 'err');
-  txt.textContent = ok ? ' متصل ✓' : 'وضع غير متصل';
-  txt.style.color = ok ? '#34d399' : '#f87171';
-}
-
-// Run init immediately (compat SDK is synchronous)
-initFirebase();
-
-// ══════════════════════════════════════════
-// Floating icons
-// ══════════════════════════════════════════
-const ICONS=['🖥️','❄️','🧺','🌬️','🔥','📺','🫙','💡','🔌','⚡'];
-const fc=document.getElementById('floatingIcons');
-for(let i=0;i<22;i++){
-  const el=document.createElement('div');el.className='icon-item';
-  el.textContent=ICONS[Math.floor(Math.random()*ICONS.length)];
-  el.style.cssText=`left:${Math.random()*100}%;font-size:${24+Math.random()*32}px;animation-duration:${18+Math.random()*22}s;animation-delay:${Math.random()*-30}s`;
-  fc.appendChild(el);
-}
-
-// ══════════════════════════════════════════
-// Panel toggle
-// ══════════════════════════════════════════
-let panelOpen=false;
-function togglePanel(){
-  panelOpen=!panelOpen;
-  document.getElementById('mainPanel').classList.toggle('open',panelOpen);
-  document.getElementById('ctaBtn').innerHTML=panelOpen?'<span>✖️</span> إغلاق':'<span>📋</span> نسبة عرض';
-  if(panelOpen&&!document.getElementById('brandRows').children.length) addBrandRow();
-}
-
-// ══════════════════════════════════════════
-// Sections
-// ══════════════════════════════════════════
-const SECTIONS=[
-  {value:'الشاشات',    label:'🖥️ الشاشات'},
-  {value:'الغسالات',   label:'🧺 الغسالات'},
-  {value:'الثلاجات',   label:'❄️ الثلاجات'},
-  {value:'البوتاجازات',label:'🔥 البوتاجازات'},
-  {value:'التكييفات',  label:'🌬️ التكييفات'},
-  {value:'الرفايع',    label:'📦 الرفايع'},
-];
-let rowCount=0;
-function addBrandRow(){
-  rowCount++;const n=rowCount;
-  const div=document.createElement('div');div.className='brand-row';div.id=`row_${n}`;
-  div.innerHTML=`
-    <div class="field-group">
-      <label class="field-label">اختر القسم</label>
-      <select class="field-select" id="brand_${n}" onchange="onBrandChange(${n})">
-        <option value="">-- اختر --</option>
-        ${SECTIONS.map(s=>`<option value="${s.value}">${s.label}</option>`).join('')}
-      </select>
-    </div>
-    <div class="field-group" id="cWrap_${n}" style="display:none">
-      <label class="field-label">إجمالي العدد</label>
-      <input type="number" class="field-input" id="count_${n}" min="0" placeholder="0" oninput="liveUpdate()"/>
-    </div>
-    <div class="field-group" id="aWrap_${n}" style="display:none">
-      <label class="field-label">عدد العربي</label>
-      <input type="number" class="field-input" id="arabi_${n}" min="0" placeholder="0" oninput="liveUpdate()"/>
-    </div>
-    <button class="remove-btn" onclick="document.getElementById('row_${n}').remove();liveUpdate()">🗑️</button>`;
-  document.getElementById('brandRows').appendChild(div);
-}
-function onBrandChange(n){
-  const show=document.getElementById(`brand_${n}`).value!=='';
-  document.getElementById(`cWrap_${n}`).style.display=show?'':'none';
-  document.getElementById(`aWrap_${n}`).style.display=show?'':'none';
-}
-
-// ══════════════════════════════════════════
-// Data gather
-// ══════════════════════════════════════════
-function gatherData(){
-  const branch=document.getElementById('branchInput').value.trim();
-  const agent=document.getElementById('agentName').value.trim();
-  let total=0,arabi=0;const sections=[];
-  document.querySelectorAll('#brandRows .brand-row').forEach(row=>{
-    const id=row.id.replace('row_','');
-    const brand=document.getElementById(`brand_${id}`);
-    if(!brand||!brand.value) return;
-    const count=parseInt(document.getElementById(`count_${id}`)?.value)||0;
-    const arab=parseInt(document.getElementById(`arabi_${id}`)?.value)||0;
-    total+=count;arabi+=arab;
-    sections.push({label:brand.options[brand.selectedIndex].text,count,arabi:arab});
-  });
-  const pct=total>0?((arabi/total)*100).toFixed(1):0;
-  return{branch,agent,total,arabi,pct,sections,timestamp:new Date().toLocaleString('ar-EG')};
-}
-
-// ══════════════════════════════════════════
-// Calculate
-// ══════════════════════════════════════════
-function liveUpdate(){
-  if(document.getElementById('resultsSection').style.display!=='none') calculate(false);
-}
-function calculate(doScroll){
-  if(!document.querySelectorAll('#brandRows .brand-row').length){
-    if(doScroll) showToast('يرجى إضافة قسم واحد على الأقل','error');
-    return false;
-  }
-  const d=gatherData();
-  document.getElementById('resultsSection').style.display='';
-  document.getElementById('resTotal').textContent=d.total;
-  document.getElementById('resArabi').textContent=d.arabi;
-  document.getElementById('resPct').textContent=d.pct+'%';
-  document.getElementById('progressLabel').textContent=d.pct+'%';
-  setTimeout(()=>{document.getElementById('progressFill').style.width=Math.min(d.pct,100)+'%'},100);
-  const bk=document.getElementById('brandsBreakdown');bk.innerHTML='';
-  d.sections.forEach((s,i)=>{
-    const rp=d.total>0?((s.arabi/d.total)*100).toFixed(1):0;
-    const el=document.createElement('div');el.className='brand-result-row';
-    el.innerHTML=`<span class="bname">${s.label}</span><span class="bcount">العدد: ${s.count} | العربي: ${s.arabi}</span><span class="bpct">${rp}%</span>`;
-    bk.appendChild(el);
-  });
-  if(doScroll) document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'nearest'});
-  return true;
-}
-
-// ══════════════════════════════════════════
-// Toast — explicit only, never auto
-// ══════════════════════════════════════════
-let _tt=null;
-function showToast(msg,type='success'){
-  const t=document.getElementById('toast');
-  if(_tt){clearTimeout(_tt);t.classList.remove('show');void t.offsetWidth;}
-  t.textContent=(type==='success'?'✅ ':'❌ ')+msg;
-  t.className='toast'+(type==='error'?' error':'');
-  void t.offsetWidth;
-  t.classList.add('show');
-  _tt=setTimeout(()=>{t.classList.remove('show');_tt=null;},3500);
-}
-
-// ══════════════════════════════════════════
-// Send report
-// ══════════════════════════════════════════
-async function sendReport(){
-  const branch=document.getElementById('branchInput').value.trim();
-  const agent=document.getElementById('agentName').value.trim();
-  if(!branch){showToast('يرجى إدخال اسم الفرع','error');return;}
-  if(!agent){showToast('يرجى إدخال اسم المندوب','error');return;}
-  if(!document.querySelectorAll('#brandRows .brand-row').length){
-    showToast('يرجى إضافة قسم واحد على الأقل','error');return;
-  }
-  calculate(false);
-  const d=gatherData();
-  if(d.total===0){showToast('يرجى إدخال أعداد صحيحة','error');return;}
-
-  const btn=document.getElementById('sendBtn');
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span> جاري الإرسال...';
-
-  try {
-    if(fbOk && db) {
-      // ✅ Firebase Firestore
-      await db.collection('reports').add({
-        ...d,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      showToast('تم إرسال التقرير بنجاح إلى لوحة التحكم ✅');
-    } else {
-      // Fallback localStorage
-      const arr=JSON.parse(localStorage.getItem('arabi_reports')||'[]');
-      arr.push({id:Date.now(),...d});
-      localStorage.setItem('arabi_reports',JSON.stringify(arr));
-      showToast('تم الحفظ محلياً (Firebase غير متاح)');
-    }
-    setTimeout(resetForm, 1800);
-  } catch(err) {
-    console.error('Send error:', err);
-    // Fallback on error
-    const arr=JSON.parse(localStorage.getItem('arabi_reports')||'[]');
-    arr.push({id:Date.now(),...d});
-    localStorage.setItem('arabi_reports',JSON.stringify(arr));
-    showToast('خطأ Firebase — تم الحفظ محلياً', 'error');
-    setTimeout(resetForm, 2000);
-  } finally {
-    btn.disabled=false;
-    btn.innerHTML='📤 إرسال التقرير';
-  }
-}
-
-// ══════════════════════════════════════════
-// Reset
-// ══════════════════════════════════════════
-function resetForm(){
-  document.getElementById('branchInput').value='';
-  document.getElementById('agentName').value='';
-  document.getElementById('brandRows').innerHTML='';
-  document.getElementById('resultsSection').style.display='none';
-  document.getElementById('progressFill').style.width='0%';
-  rowCount=0;addBrandRow();
-}
-</script>
-</body>
-</html>
+  messa
